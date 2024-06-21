@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
+  fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`),
 );
 
 exports.checkID = (req, res, next, val) => {
@@ -12,6 +12,15 @@ exports.checkID = (req, res, next, val) => {
       message: 'Invalid ID',
     });
   }
+  next();
+};
+
+exports.checkBody = (req, res, next) => {
+  if (!req.body.name || !req.body.price)
+    return res.status(400).json({
+      status: 'Fail',
+      message: 'Missing name or price',
+    });
   next();
 };
 
@@ -57,7 +66,7 @@ exports.createTour = (req, res) => {
           tour: newTour,
         },
       });
-    }
+    },
   );
 };
 
