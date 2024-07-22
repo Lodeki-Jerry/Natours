@@ -32,9 +32,19 @@ app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 
 app.all('*', (req, res, next) => {
-  next(new AppError(`Cannot find the ${req.originalUrl} on the server`, 404));
+  // res.status(404).json({
+  //   status: 'Fail',
+  //   message: `Cannot find ${req.originalUrl} on this server`,
+  // });
+  // const err = new Error(`Cannot find ${req.originalUrl} on this server`);
+  // err.status = 'fail';
+  // err.statusCode = 404;
+
+  next(new AppError(`Cannot find ${req.originalUrl} on this server`, 404));
 });
 
 app.use(globalErrorHandler);
+
+// app.use(globalErrorHandler);
 
 module.exports = app;
