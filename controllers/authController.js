@@ -72,15 +72,15 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // 3) Check if user still exists
 
-  const freshUser = await User.findById(decoded.id);
-  if (!freshUser) {
+  const currentUser = await User.findById(decoded.id);
+  if (!currentUser) {
     return next(
       new AppError('The token belonging to this user does not exist!', 401),
     );
   }
 
   // 4) Check if user changed the password after token was issued
-  if (freshUser.changedPasswordAfter(decoded.iat)) {
+  if (currentUser.changedPasswordAfter(decoded.iat)) {
     return next(
       new AppError(
         'User recently changed the password! Please login again',
@@ -88,6 +88,19 @@ exports.protect = catchAsync(async (req, res, next) => {
       ),
     );
   }
-  req.user = freshUser;
+  req.user = currentUser;
   next();
 });
+
+exports.restrictTo = function (...roles) {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return new AppError(
+        'You do not have permission to perfom this action',
+        403,
+      );
+    }
+
+    next();
+  };
+};
