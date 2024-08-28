@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const slugify = require('slugify');
 
-const User = require('./userModel');
+// const User = require('./userModel');
 
 // const validator = require('validator');
 
@@ -105,7 +105,12 @@ const tourSchema = new mongoose.Schema(
         day: Number,
       },
     ],
-    guides: Array,
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
@@ -122,12 +127,12 @@ tourSchema.pre('save', function (next) {
   next();
 });
 
-tourSchema.pre('save', async function (next) {
-  const guidesPromises = this.guides.map(async (id) => await User.findById(id));
-  this.guides = await Promise.all(guidesPromises);
+// tourSchema.pre('save', async function (next) {
+//   const guidesPromises = this.guides.map(async (id) => await User.findById(id));
+//   this.guides = await Promise.all(guidesPromises);
 
-  next();
-});
+//   next();
+// });
 
 // tourSchema.pre('save', function (next) {
 //   console.log('Will save the document');
@@ -144,6 +149,15 @@ tourSchema.pre('save', async function (next) {
 tourSchema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
   this.start = Date.now();
+  next();
+});
+
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-_v -passwordChangedAt',
+  });
+
   next();
 });
 
