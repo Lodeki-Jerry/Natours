@@ -1,3 +1,5 @@
+const path = require('path');
+
 const express = require('express');
 
 const morgan = require('morgan');
@@ -23,6 +25,12 @@ const userRouter = require('./Routes/userRoutes');
 const reviewRouter = require('./Routes/reviewRoutes');
 
 const app = express();
+
+app.set('view engine', 'pug');
+
+app.set('views', path.join(__dirname, 'views'));
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 // 1) MIDDLEWARES
 app.use(helmet());
@@ -59,8 +67,6 @@ app.use(
   }),
 );
 
-app.use(express.static(`${__dirname}/public`));
-
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   // console.log(req.headers);
@@ -68,6 +74,10 @@ app.use((req, res, next) => {
 });
 
 // 3) ROUTES
+
+app.get('/', (req, res) => {
+  res.status(200).render('base');
+});
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
