@@ -19,6 +19,9 @@ exports.getTour = catchAsync(async (req, res) => {
     path: 'reviews',
     fields: 'review rating user',
   });
+  // 2) Build Template
+
+  // 3) Render Template
   res.status(200).render('tour', {
     title: 'The Forest Hiker',
     tour,
